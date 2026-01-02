@@ -498,7 +498,7 @@ local function sort_bookmarks(bookmarks, key1, key2, reverse)
   return bookmarks
 end
 
-local action_save, action_jump, action_delete, which_find, fzf_find, fzf_find_for_rename, fzf_history
+local action_save, action_jump, action_delete, which_find, fzf_find, fzf_find_for_rename, fzf_history, fzf_find_multi, which_find_deletable
 
 local function get_all_bookmarks()
   local all_b = {}
