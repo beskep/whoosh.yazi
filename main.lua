@@ -1,6 +1,7 @@
 --- @since 25.5.28
 local path_sep = package.config:sub(1, 1)
 
+local TARGET_FAMILY = ya.target_family()
 local DEFAULT_SPECIAL_KEYS = {
   create_temp = "<Enter>",
   fuzzy_search = "<Space>",
@@ -9,7 +10,7 @@ local DEFAULT_SPECIAL_KEYS = {
 }
 
 local function get_fzf_delimiter()
-  if ya.target_family() == "windows" then
+  if TARGET_FAMILY == "windows" then
     return "--delimiter=\\t"
   else
     return "--delimiter='\t'"
@@ -21,7 +22,7 @@ local get_hovered_path = ya.sync(function(state)
   if h then
     local path = tostring(h.url)
     if h.cha.is_dir then
-      if ya.target_family() == "windows" and path:match("^[A-Za-z]:$") then
+      if TARGET_FAMILY == "windows" and path:match("^[A-Za-z]:$") then
         return path .. "\\"
       end
       return path
@@ -42,7 +43,7 @@ end)
 
 local get_current_dir_path = ya.sync(function()
   local path = tostring(cx.active.current.cwd)
-  if ya.target_family() == "windows" and path:match("^[A-Za-z]:$") then
+  if TARGET_FAMILY == "windows" and path:match("^[A-Za-z]:$") then
     return path .. "\\"
   end
   return path
@@ -106,7 +107,7 @@ local function ensure_directory(path)
   if not dir_path then
     return
   end
-  if ya.target_family() == "windows" then
+  if TARGET_FAMILY == "windows" then
     os.execute('mkdir "' .. dir_path:gsub("/", "\\") .. '" 2>nul')
   else
     os.execute('mkdir -p "' .. dir_path .. '"')
@@ -116,7 +117,7 @@ end
 local function normalize_path(path)
   local normalized_path = tostring(path):gsub("[\\/]+", path_sep)
 
-  if ya.target_family() == "windows" then
+  if TARGET_FAMILY == "windows" then
     if normalized_path:match("^[A-Za-z]:[\\/]*$") then
       normalized_path = normalized_path:gsub("^([A-Za-z]:)[\\/]*", "%1\\")
     else
@@ -147,7 +148,7 @@ local function apply_home_alias(path)
   end
 
   local home = os.getenv("HOME")
-  if ya.target_family() == "windows" and (not home or home == "") then
+  if TARGET_FAMILY == "windows" and (not home or home == "") then
     home = os.getenv("USERPROFILE")
   end
   if not home or home == "" then
@@ -161,7 +162,7 @@ local function apply_home_alias(path)
 
   local sep = path_sep
 
-  if ya.target_family() == "windows" then
+  if TARGET_FAMILY == "windows" then
     local path_lower = path:lower()
     local home_lower = normalized_home:lower()
     if path_lower == home_lower then
@@ -221,7 +222,7 @@ local function truncate_long_folder_names(path, max_folder_length)
     return path
   end
 
-  local separator = ya.target_family() == "windows" and "\\" or "/"
+  local separator = TARGET_FAMILY == "windows" and "\\" or "/"
   local parts = {}
 
   for part in path:gmatch("[^" .. separator .. "]+") do
@@ -249,9 +250,9 @@ local function truncate_path(path, max_parts)
   normalized_path = apply_home_alias(normalized_path)
 
   local parts = {}
-  local separator = ya.target_family() == "windows" and "\\" or "/"
+  local separator = TARGET_FAMILY == "windows" and "\\" or "/"
 
-  if ya.target_family() == "windows" then
+  if TARGET_FAMILY == "windows" then
     local drive, rest = normalized_path:match("^([A-Za-z]:\\)(.*)$")
     if drive then
       table.insert(parts, drive)
@@ -296,11 +297,11 @@ local function truncate_path(path, max_parts)
     local result_parts = {}
     local first_part = parts[1]
 
-    if ya.target_family() == "windows" and first_part:match("^[A-Za-z]:\\$") then
+    if TARGET_FAMILY == "windows" and first_part:match("^[A-Za-z]:\\$") then
       first_part = first_part:sub(1, -2)
     end
 
-    if ya.target_family() ~= "windows" and first_part == "/" then
+    if TARGET_FAMILY ~= "windows" and first_part == "/" then
       table.insert(result_parts, "")
     else
       table.insert(result_parts, first_part)
@@ -312,7 +313,7 @@ local function truncate_path(path, max_parts)
     end
 
     local out = table.concat(result_parts, separator)
-    if ya.target_family() ~= "windows" then
+    if TARGET_FAMILY ~= "windows" then
       out = out:gsub("^//+", "/")
     end
     return out
@@ -348,9 +349,9 @@ local function truncate_long_folder_names(path, max_folder_length)
     return path
   end
 
-  local separator = ya.target_family() == "windows" and "\\" or "/"
+  local separator = TARGET_FAMILY == "windows" and "\\" or "/"
   local parts = {}
-  local is_windows = ya.target_family() == "windows"
+  local is_windows = TARGET_FAMILY == "windows"
 
   if is_windows then
     local drive, rest = path:match("^([A-Za-z]:\\)(.*)$")
@@ -1452,7 +1453,7 @@ end
 
 return {
   setup = function(state, options)
-    local default_path = (ya.target_family() == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmarks") or
+    local default_path = (TARGET_FAMILY == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmarks") or
         (os.getenv("HOME") .. "/.config/yazi/bookmarks")
     local bookmarks_path = options.bookmarks_path or options.path
     if type(bookmarks_path) == "string" and bookmarks_path ~= '' then
@@ -1505,7 +1506,7 @@ return {
     local function convert_simple_bookmarks(simple_bookmarks)
       local converted = {}
       local path_sep = package.config:sub(1, 1)
-      local home_path = ya.target_family() == "windows" and os.getenv("USERPROFILE") or os.getenv("HOME")
+      local home_path = TARGET_FAMILY == "windows" and os.getenv("USERPROFILE") or os.getenv("HOME")
 
       for _, bookmark in ipairs(simple_bookmarks or {}) do
         local path = bookmark.path
@@ -1513,7 +1514,7 @@ return {
           path = home_path .. path:sub(2)
         end
 
-        if ya.target_family() == "windows" then
+        if TARGET_FAMILY == "windows" then
           path = path:gsub("/", "\\")
         else
           path = path:gsub("\\", "/")
