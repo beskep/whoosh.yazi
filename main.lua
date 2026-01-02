@@ -1,4 +1,4 @@
---- @since 25.5.28
+--- @since 25.12.29
 local path_sep = package.config:sub(1, 1)
 
 local TARGET_FAMILY = ya.target_family()
