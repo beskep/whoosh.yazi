@@ -29,7 +29,7 @@ local get_hovered_path = ya.sync(function(state)
     end
     return path
   else
-    return ''
+    return ""
   end
 end)
 
@@ -469,7 +469,9 @@ end
 local function sort_bookmarks(bookmarks, key1, key2, reverse)
   reverse = reverse or false
   table.sort(bookmarks, function(x, y)
-    if not x or not y then return false end
+    if not x or not y then
+      return false
+    end
     local x_key1, y_key1 = x[key1], y[key1]
     local x_key2, y_key2 = x[key2], y[key2]
     if x_key1 == nil and y_key1 == nil then
@@ -499,7 +501,16 @@ local function sort_bookmarks(bookmarks, key1, key2, reverse)
   return bookmarks
 end
 
-local action_save, action_jump, action_delete, which_find, fzf_find, fzf_find_for_rename, fzf_history, fzf_find_multi, which_find_deletable
+local action_delete
+local action_delete_multi
+local action_jump
+local action_save
+local fzf_find
+local fzf_find_for_rename
+local fzf_find_multi
+local fzf_history
+local which_find
+local which_find_deletable
 
 local function get_all_bookmarks()
   local all_b = {}
@@ -571,7 +582,12 @@ local save_to_file = function(mb_path, bookmarks)
   ensure_directory(mb_path)
   local file = io.open(mb_path, "w")
   if file == nil then
-    ya.notify { title = "Bookmarks Error", content = "Cannot create bookmark file: " .. mb_path, timeout = 2, level = "error" }
+    ya.notify({
+      title = "Bookmarks Error",
+      content = "Cannot create bookmark file: " .. mb_path,
+      timeout = 2,
+      level = "error",
+    })
     return
   end
   local array = {}
@@ -606,7 +622,9 @@ fzf_find = function()
     if temp_bookmarks and next(temp_bookmarks) then
       local temp_array = {}
       for _, item in pairs(temp_bookmarks) do
-        if item and item.tag and item.path and item.key then table.insert(temp_array, item) end
+        if item and item.tag and item.path and item.key then
+          table.insert(temp_array, item)
+        end
       end
       sort_bookmarks(temp_array, "tag", "key", true)
       for _, item in ipairs(temp_array) do
@@ -638,15 +656,14 @@ fzf_find = function()
         temp_file:write(formatted_line .. "\t" .. item.path .. "\n")
       end
       temp_file:close()
-      cmd = string.format("fzf %s --with-nth=1 --prompt=\"Search > \" < \"%s\"", get_fzf_delimiter(), temp_file_path)
+      cmd = string.format('fzf %s --with-nth=1 --prompt="Search > " < "%s"', get_fzf_delimiter(), temp_file_path)
     else
       temp_file:close()
-      cmd = "echo No bookmarks found | fzf --prompt=\"Search > \""
+      cmd = 'echo No bookmarks found | fzf --prompt="Search > "'
     end
   else
-    cmd = "echo No bookmarks found | fzf --prompt=\"Search > \""
+    cmd = 'echo No bookmarks found | fzf --prompt="Search > "'
   end
-
 
   local handle = io.popen(cmd, "r")
   local result = ""
@@ -655,7 +672,9 @@ fzf_find = function()
     handle:close()
   end
 
-  if temp_file_path then os.remove(temp_file_path) end
+  if temp_file_path then
+    os.remove(temp_file_path)
+  end
   permit:drop()
 
   if result and result ~= "" and result ~= "No bookmarks found" then
@@ -687,7 +706,9 @@ fzf_find_for_rename = function()
     if temp_bookmarks and next(temp_bookmarks) then
       local temp_array = {}
       for _, item in pairs(temp_bookmarks) do
-        if item and item.tag and item.path and item.key then table.insert(temp_array, item) end
+        if item and item.tag and item.path and item.key then
+          table.insert(temp_array, item)
+        end
       end
       sort_bookmarks(temp_array, "tag", "key", true)
       for _, item in ipairs(temp_array) do
@@ -719,13 +740,13 @@ fzf_find_for_rename = function()
         temp_file:write(formatted_line .. "\t" .. item.path .. "\n")
       end
       temp_file:close()
-      cmd = string.format("fzf %s --with-nth=1 --prompt=\"Rename > \" < \"%s\"", get_fzf_delimiter(), temp_file_path)
+      cmd = string.format('fzf %s --with-nth=1 --prompt="Rename > " < "%s"', get_fzf_delimiter(), temp_file_path)
     else
       temp_file:close()
-      cmd = "echo No bookmarks found | fzf --prompt=\"Rename > \""
+      cmd = 'echo No bookmarks found | fzf --prompt="Rename > "'
     end
   else
-    cmd = "echo No bookmarks found | fzf --prompt=\"Rename > \""
+    cmd = 'echo No bookmarks found | fzf --prompt="Rename > "'
   end
 
   local handle = io.popen(cmd, "r")
@@ -735,7 +756,9 @@ fzf_find_for_rename = function()
     handle:close()
   end
 
-  if temp_file_path then os.remove(temp_file_path) end
+  if temp_file_path then
+    os.remove(temp_file_path)
+  end
   permit:drop()
 
   if result and result ~= "" and result ~= "No bookmarks found" then
@@ -765,7 +788,9 @@ fzf_find_multi = function()
     if temp_bookmarks and next(temp_bookmarks) then
       local temp_array = {}
       for _, item in pairs(temp_bookmarks) do
-        if item and item.tag and item.path and item.key then table.insert(temp_array, item) end
+        if item and item.tag and item.path and item.key then
+          table.insert(temp_array, item)
+        end
       end
       sort_bookmarks(temp_array, "tag", "key", true)
       for _, item in ipairs(temp_array) do
@@ -797,14 +822,14 @@ fzf_find_multi = function()
         temp_file:write(formatted_line .. "\t" .. item.path .. "\n")
       end
       temp_file:close()
-      cmd = string.format("fzf --multi %s --with-nth=1 --prompt=\"Delete > \" < \"%s\"",
-        get_fzf_delimiter(), temp_file_path)
+      cmd =
+        string.format('fzf --multi %s --with-nth=1 --prompt="Delete > " < "%s"', get_fzf_delimiter(), temp_file_path)
     else
       temp_file:close()
-      cmd = "echo No deletable bookmarks found | fzf --prompt=\"Delete > \""
+      cmd = 'echo No deletable bookmarks found | fzf --prompt="Delete > "'
     end
   else
-    cmd = "echo No deletable bookmarks found | fzf --prompt=\"Delete > \""
+    cmd = 'echo No deletable bookmarks found | fzf --prompt="Delete > "'
   end
 
   local handle = io.popen(cmd, "r")
@@ -814,7 +839,9 @@ fzf_find_multi = function()
     handle:close()
   end
 
-  if temp_file_path then os.remove(temp_file_path) end
+  if temp_file_path then
+    os.remove(temp_file_path)
+  end
   permit:drop()
 
   if result and result ~= "" and result ~= "No deletable bookmarks found" then
@@ -863,8 +890,7 @@ fzf_history = function()
     end
     temp_file:close()
 
-    local cmd = string.format("fzf %s --with-nth=1 --prompt=\"History > \" < \"%s\"",
-      get_fzf_delimiter(), temp_file_path)
+    local cmd = string.format('fzf %s --with-nth=1 --prompt="History > " < "%s"', get_fzf_delimiter(), temp_file_path)
     local handle = io.popen(cmd, "r")
     local result = ""
     if handle then
@@ -945,8 +971,10 @@ which_find = function()
       if item and item.tag and #item.tag ~= 0 then
         local tag_with_prefix = "[TEMP] " .. item.tag
         local display_path = path_to_desc(item.path or path)
-        table.insert(all_bookmark_items,
-          { tag = tag_with_prefix, path = item.path or path, key = item.key or "", is_temp = true })
+        table.insert(
+          all_bookmark_items,
+          { tag = tag_with_prefix, path = item.path or path, key = item.key or "", is_temp = true }
+        )
         max_tag_width = math.max(max_tag_width, get_display_width(tag_with_prefix))
         max_path_width = math.max(max_path_width, get_display_width(display_path))
       end
@@ -956,16 +984,21 @@ which_find = function()
   for path, item in pairs(bookmarks) do
     if item and item.tag and #item.tag ~= 0 then
       local display_path = path_to_desc(item.path or path)
-      table.insert(all_bookmark_items,
-        { tag = item.tag, path = item.path or path, key = item.key or "", is_temp = false })
+      table.insert(
+        all_bookmark_items,
+        { tag = item.tag, path = item.path or path, key = item.key or "", is_temp = false }
+      )
       max_tag_width = math.max(max_tag_width, get_display_width(item.tag))
       max_path_width = math.max(max_path_width, get_display_width(display_path))
     end
   end
 
   for _, item in ipairs(all_bookmark_items) do
-    if item.key and item.key ~= "" and
-        (type(item.key) == "string" or (type(item.key) == "table" and #item.key > 0)) then
+    if
+      item.key
+      and item.key ~= ""
+      and (type(item.key) == "string" or (type(item.key) == "table" and #item.key > 0))
+    then
       local formatted_desc = format_bookmark_for_menu(item.tag, item.key)
       table.insert(cands_bookmarks, { desc = formatted_desc, on = item.key, path = item.path })
     end
@@ -974,14 +1007,20 @@ which_find = function()
   sort_bookmarks(cands_bookmarks, "on", "desc", false)
 
   local cands = {}
-  for _, item in ipairs(cands_static) do table.insert(cands, item) end
-  for _, item in ipairs(cands_bookmarks) do table.insert(cands, item) end
+  for _, item in ipairs(cands_static) do
+    table.insert(cands, item)
+  end
+  for _, item in ipairs(cands_bookmarks) do
+    table.insert(cands, item)
+  end
 
   if #cands == #cands_static and #cands_bookmarks == 0 then
-    ya.notify { title = "Bookmarks", content = "No bookmarks found", timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = "No bookmarks found", timeout = 1, level = "info" })
   end
-  local idx = ya.which { cands = cands }
-  if idx == nil then return nil end
+  local idx = ya.which({ cands = cands })
+  if idx == nil then
+    return nil
+  end
   return cands[idx].path
 end
 
@@ -997,8 +1036,10 @@ which_find_deletable = function()
     for path, item in pairs(temp_bookmarks) do
       if item and item.tag and #item.tag ~= 0 then
         local tag_with_prefix = "[TEMP] " .. item.tag
-        table.insert(all_bookmark_items,
-          { tag = tag_with_prefix, path = item.path or path, key = item.key or "", is_temp = true })
+        table.insert(
+          all_bookmark_items,
+          { tag = tag_with_prefix, path = item.path or path, key = item.key or "", is_temp = true }
+        )
       end
     end
   end
@@ -1006,15 +1047,20 @@ which_find_deletable = function()
   if user_bookmarks then
     for path, item in pairs(user_bookmarks) do
       if item and item.tag and #item.tag ~= 0 then
-        table.insert(all_bookmark_items,
-          { tag = item.tag, path = item.path or path, key = item.key or "", is_temp = false })
+        table.insert(
+          all_bookmark_items,
+          { tag = item.tag, path = item.path or path, key = item.key or "", is_temp = false }
+        )
       end
     end
   end
 
   for _, item in ipairs(all_bookmark_items) do
-    if item.key and item.key ~= "" and
-        (type(item.key) == "string" or (type(item.key) == "table" and #item.key > 0)) then
+    if
+      item.key
+      and item.key ~= ""
+      and (type(item.key) == "string" or (type(item.key) == "table" and #item.key > 0))
+    then
       local formatted_desc = format_bookmark_for_menu(item.tag, item.key)
       table.insert(cands_bookmarks, { desc = formatted_desc, on = item.key, path = item.path })
     end
@@ -1023,17 +1069,21 @@ which_find_deletable = function()
   sort_bookmarks(cands_bookmarks, "on", "desc", false)
 
   if #cands_bookmarks == 0 then
-    ya.notify { title = "Bookmarks", content = "No deletable bookmarks found", timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = "No deletable bookmarks found", timeout = 1, level = "info" })
     return nil
   end
 
-  local idx = ya.which { cands = cands_bookmarks }
-  if idx == nil then return nil end
+  local idx = ya.which({ cands = cands_bookmarks })
+  if idx == nil then
+    return nil
+  end
   return cands_bookmarks[idx].path
 end
 
 action_jump = function(path)
-  if path == nil then return end
+  if path == nil then
+    return
+  end
 
   local jump_notify = get_state_attr("jump_notify")
   local all_bookmarks = get_all_bookmarks()
@@ -1044,18 +1094,24 @@ action_jump = function(path)
     return
   elseif path == "__FUZZY_SEARCH__" then
     local selected_path = fzf_find()
-    if selected_path then action_jump(selected_path) end
+    if selected_path then
+      action_jump(selected_path)
+    end
     return
   elseif path == "__HISTORY__" then
     local selected_path = fzf_history()
-    if selected_path then action_jump(selected_path) end
+    if selected_path then
+      action_jump(selected_path)
+    end
     return
   end
 
   local bookmark = temp_bookmarks[path] or all_bookmarks[path]
   if not bookmark then
     ya.emit("cd", { path })
-    if jump_notify then ya.notify { title = "Bookmarks", content = 'Jump to "' .. path_to_desc(path) .. '"', timeout = 1, level = "info" } end
+    if jump_notify then
+      ya.notify({ title = "Bookmarks", content = 'Jump to "' .. path_to_desc(path) .. '"', timeout = 1, level = "info" })
+    end
     return
   end
 
@@ -1066,12 +1122,14 @@ action_jump = function(path)
 
   if jump_notify then
     local prefix = is_temp and "[TEMP] " or ""
-    ya.notify { title = "Bookmarks", content = 'Jump to "' .. prefix .. tag .. '"', timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = 'Jump to "' .. prefix .. tag .. '"', timeout = 1, level = "info" })
   end
 end
 
 local function parse_keys_input(input)
-  if not input or input == "" then return {} end
+  if not input or input == "" then
+    return {}
+  end
   local seq = {}
   for token in input:gmatch("[^,%s]+") do
     token = token:gsub("^%s*(.-)%s*$", "%1")
@@ -1119,14 +1177,26 @@ local function _seq_from_key(k)
 end
 
 local function _seq_equal(a, b)
-  if #a ~= #b then return false end
-  for i = 1, #a do if a[i] ~= b[i] then return false end end
+  if #a ~= #b then
+    return false
+  end
+  for i = 1, #a do
+    if a[i] ~= b[i] then
+      return false
+    end
+  end
   return true
 end
 
 local function _seq_is_prefix(short, long)
-  if #short >= #long then return false end
-  for i = 1, #short do if short[i] ~= long[i] then return false end end
+  if #short >= #long then
+    return false
+  end
+  for i = 1, #short do
+    if short[i] ~= long[i] then
+      return false
+    end
+  end
   return true
 end
 
@@ -1135,12 +1205,18 @@ local function _seq_to_string(seq)
 end
 
 local function find_path_by_key_sequence(seq)
-  if not seq or #seq == 0 then return nil end
+  if not seq or #seq == 0 then
+    return nil
+  end
 
   local function matches(candidate)
-    if candidate == nil or candidate == "" then return false end
+    if candidate == nil or candidate == "" then
+      return false
+    end
     local candidate_seq = _seq_from_key(candidate)
-    if #candidate_seq == 0 then return false end
+    if #candidate_seq == 0 then
+      return false
+    end
     return _seq_equal(seq, candidate_seq)
   end
 
@@ -1170,19 +1246,24 @@ end
 local function jump_by_key_spec(spec)
   local cleaned = (spec or ""):gsub("^%s*(.-)%s*$", "%1")
   if cleaned == "" then
-    ya.notify { title = "Bookmarks", content = "Missing key sequence", timeout = 1, level = "warn" }
+    ya.notify({ title = "Bookmarks", content = "Missing key sequence", timeout = 1, level = "warn" })
     return false
   end
 
   local seq = parse_keys_input(cleaned)
   if #seq == 0 then
-    ya.notify { title = "Bookmarks", content = "Missing key sequence", timeout = 1, level = "warn" }
+    ya.notify({ title = "Bookmarks", content = "Missing key sequence", timeout = 1, level = "warn" })
     return false
   end
 
   local path = find_path_by_key_sequence(seq)
   if not path then
-    ya.notify { title = "Bookmarks", content = "Bookmark not found for key: " .. _seq_to_string(seq), timeout = 1, level = "info" }
+    ya.notify({
+      title = "Bookmarks",
+      content = "Bookmark not found for key: " .. _seq_to_string(seq),
+      timeout = 1,
+      level = "info",
+    })
     return false
   end
 
@@ -1225,19 +1306,27 @@ local generate_key = function()
       end
     end
   end
-  if #mb == 0 then return keys[1] end
+  if #mb == 0 then
+    return keys[1]
+  end
 
-  table.sort(mb, function(a, b) return (key2rank[a] or 999) < (key2rank[b] or 999) end)
+  table.sort(mb, function(a, b)
+    return (key2rank[a] or 999) < (key2rank[b] or 999)
+  end)
   local idx = 1
   for _, key in ipairs(keys) do
-    if idx > #mb or (key2rank[key] or 999) < (key2rank[mb[idx]] or 999) then return key end
+    if idx > #mb or (key2rank[key] or 999) < (key2rank[mb[idx]] or 999) then
+      return key
+    end
     idx = idx + 1
   end
   return nil
 end
 
 action_save = function(path, is_temp)
-  if path == nil or #path == 0 then return end
+  if path == nil or #path == 0 then
+    return
+  end
 
   local mb_path = get_state_attr("path")
   local all_bookmarks = get_all_bookmarks()
@@ -1253,26 +1342,32 @@ action_save = function(path, is_temp)
   while true do
     local title = is_temp and "Tag ⟨alias name⟩ [TEMPORARY]" or "Tag ⟨alias name⟩"
     local value, event = ya.input({ title = title, value = tag, position = { "top-center", y = 3, w = 40 } })
-    if event ~= 1 then return end
-    tag = value or ''
+    if event ~= 1 then
+      return
+    end
+    tag = value or ""
     if #tag == 0 then
-      ya.notify { title = "Bookmarks", content = "Empty tag", timeout = 1, level = "info" }
+      ya.notify({ title = "Bookmarks", content = "Empty tag", timeout = 1, level = "info" })
     else
       local tag_obj = nil
       for _, item in pairs(all_bookmarks) do
         if item.tag == tag then
-          tag_obj = item; break
+          tag_obj = item
+          break
         end
       end
       if not tag_obj and temp_bookmarks then
         for _, item in pairs(temp_bookmarks) do
           if item.tag == tag then
-            tag_obj = item; break
+            tag_obj = item
+            break
           end
         end
       end
-      if tag_obj == nil or tag_obj.path == path then break end
-      ya.notify { title = "Bookmarks", content = "Duplicated tag", timeout = 1, level = "info" }
+      if tag_obj == nil or tag_obj.path == path then
+        break
+      end
+      ya.notify({ title = "Bookmarks", content = "Duplicated tag", timeout = 1, level = "info" })
     end
   end
 
@@ -1283,9 +1378,11 @@ action_save = function(path, is_temp)
     local value, event = ya.input({
       title = "Keys ⟨space, comma or empty separator⟩",
       value = key_display,
-      position = { "top-center", y = 3, w = 50 }
+      position = { "top-center", y = 3, w = 50 },
     })
-    if event ~= 1 then return end
+    if event ~= 1 then
+      return
+    end
 
     local input_str = value or ""
     if input_str == "" then
@@ -1312,10 +1409,12 @@ action_save = function(path, is_temp)
           local exist = _seq_from_key(item.key)
           if #exist > 0 then
             if _seq_equal(new_seq, exist) then
-              conflict, conflict_seq = "duplicate", exist; return true
+              conflict, conflict_seq = "duplicate", exist
+              return true
             end
             if _seq_is_prefix(new_seq, exist) or _seq_is_prefix(exist, new_seq) then
-              conflict, conflict_seq = "prefix", exist; return true
+              conflict, conflict_seq = "prefix", exist
+              return true
             end
           end
         end
@@ -1324,10 +1423,9 @@ action_save = function(path, is_temp)
     end
 
     if check(all_bookmarks) or check(temp_bookmarks) then
-      local msg = (conflict == "duplicate")
-        and ("Duplicated key sequence: " .. _seq_to_string(new_seq))
+      local msg = (conflict == "duplicate") and ("Duplicated key sequence: " .. _seq_to_string(new_seq))
         or ("Ambiguous with existing sequence: " .. _seq_to_string(conflict_seq))
-      ya.notify { title = "Bookmarks", content = msg, timeout = 2, level = "info" }
+      ya.notify({ title = "Bookmarks", content = msg, timeout = 2, level = "info" })
       key_display = input_str
     else
       break
@@ -1336,17 +1434,19 @@ action_save = function(path, is_temp)
 
   if is_temp then
     set_temp_bookmarks(path, { tag = tag, path = path, key = key })
-    ya.notify { title = "Bookmarks", content = '[TEMP] "' .. tag .. '" saved', timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = '[TEMP] "' .. tag .. '" saved', timeout = 1, level = "info" })
   else
     set_bookmarks(path, { tag = tag, path = path, key = key })
     local user_bookmarks = get_state_attr("bookmarks")
     save_to_file(mb_path, user_bookmarks)
-    ya.notify { title = "Bookmarks", content = '"' .. tag .. '" saved', timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = '"' .. tag .. '" saved', timeout = 1, level = "info" })
   end
 end
 
 action_delete = function(path)
-  if path == nil then return end
+  if path == nil then
+    return
+  end
 
   local mb_path = get_state_attr("path")
   local user_bookmarks = get_state_attr("bookmarks")
@@ -1354,7 +1454,12 @@ action_delete = function(path)
   local bookmark = temp_bookmarks[path] or user_bookmarks[path]
 
   if not bookmark then
-    ya.notify { title = "Bookmarks", content = 'Cannot delete: Not a user or temp bookmark', timeout = 2, level = "warn" }
+    ya.notify({
+      title = "Bookmarks",
+      content = "Cannot delete: Not a user or temp bookmark",
+      timeout = 2,
+      level = "warn",
+    })
     return
   end
   local tag = bookmark.tag
@@ -1362,17 +1467,19 @@ action_delete = function(path)
 
   if is_temp then
     set_temp_bookmarks(path, nil)
-    ya.notify { title = "Bookmarks", content = '[TEMP] "' .. tag .. '" deleted', timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = '[TEMP] "' .. tag .. '" deleted', timeout = 1, level = "info" })
   else
     set_bookmarks(path, nil)
     local updated_user_bookmarks = get_state_attr("bookmarks")
     save_to_file(mb_path, updated_user_bookmarks)
-    ya.notify { title = "Bookmarks", content = '"' .. tag .. '" deleted', timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = '"' .. tag .. '" deleted', timeout = 1, level = "info" })
   end
 end
 
 action_delete_multi = function(paths)
-  if not paths or #paths == 0 then return end
+  if not paths or #paths == 0 then
+    return
+  end
 
   local mb_path = get_state_attr("path")
   local user_bookmarks = get_state_attr("bookmarks")
@@ -1426,9 +1533,9 @@ action_delete_multi = function(paths)
 
   local final_message = table.concat(message_parts, ", ")
   if total_deleted > 0 then
-    ya.notify { title = "Bookmarks", content = final_message, timeout = 2, level = "info" }
+    ya.notify({ title = "Bookmarks", content = final_message, timeout = 2, level = "info" })
   else
-    ya.notify { title = "Bookmarks", content = "No bookmarks were deleted", timeout = 1, level = "warn" }
+    ya.notify({ title = "Bookmarks", content = "No bookmarks were deleted", timeout = 1, level = "warn" })
   end
 end
 
@@ -1437,51 +1544,51 @@ local action_delete_all = function(temp_only)
   local title = temp_only and "Delete all temporary bookmarks? ⟨y/n⟩" or "Delete all user bookmarks? ⟨y/n⟩"
   local value, event = ya.input({ title = title, position = { "top-center", y = 3, w = 45 } })
   if event ~= 1 or string.lower(value or "") ~= "y" then
-    ya.notify { title = "Bookmarks", content = "Cancel delete", timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = "Cancel delete", timeout = 1, level = "info" })
     return
   end
 
   if temp_only then
     set_state_attr("temp_bookmarks", {})
-    ya.notify { title = "Bookmarks", content = "All temporary bookmarks deleted", timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = "All temporary bookmarks deleted", timeout = 1, level = "info" })
   else
     set_state_attr("bookmarks", {})
     save_to_file(mb_path, {})
-    ya.notify { title = "Bookmarks", content = "All user-created bookmarks deleted", timeout = 1, level = "info" }
+    ya.notify({ title = "Bookmarks", content = "All user-created bookmarks deleted", timeout = 1, level = "info" })
   end
 end
 
 return {
   setup = function(state, options)
-    local default_path = (TARGET_FAMILY == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmarks") or
-        (os.getenv("HOME") .. "/.config/yazi/bookmarks")
+    local default_path = (TARGET_FAMILY == "windows" and os.getenv("APPDATA") .. "\\yazi\\config\\bookmarks")
+      or (os.getenv("HOME") .. "/.config/yazi/bookmarks")
     local bookmarks_path = options.bookmarks_path or options.path
-    if type(bookmarks_path) == "string" and bookmarks_path ~= '' then
-        state.path = bookmarks_path
+    if type(bookmarks_path) == "string" and bookmarks_path ~= "" then
+      state.path = bookmarks_path
     else
-        state.path = default_path
+      state.path = default_path
     end
     state.jump_notify = options.jump_notify == nil and false or options.jump_notify
     state.home_alias_enabled = options.home_alias_enabled == nil and true or options.home_alias_enabled
     state.path_truncate_enabled = options.path_truncate_enabled == nil and false or options.path_truncate_enabled
     state.path_max_depth = options.path_max_depth or 3
-    state.fzf_path_truncate_enabled = options.fzf_path_truncate_enabled == nil and false or
-        options.fzf_path_truncate_enabled
+    state.fzf_path_truncate_enabled = options.fzf_path_truncate_enabled == nil and false
+      or options.fzf_path_truncate_enabled
     state.fzf_path_max_depth = options.fzf_path_max_depth or 5
-    state.path_truncate_long_names_enabled = options.path_truncate_long_names_enabled == nil and false or
-        options.path_truncate_long_names_enabled
-    state.fzf_path_truncate_long_names_enabled = options.fzf_path_truncate_long_names_enabled == nil and false or
-        options.fzf_path_truncate_long_names_enabled
+    state.path_truncate_long_names_enabled = options.path_truncate_long_names_enabled == nil and false
+      or options.path_truncate_long_names_enabled
+    state.fzf_path_truncate_long_names_enabled = options.fzf_path_truncate_long_names_enabled == nil and false
+      or options.fzf_path_truncate_long_names_enabled
     state.path_max_folder_name_length = options.path_max_folder_name_length or 20
     state.fzf_path_max_folder_name_length = options.fzf_path_max_folder_name_length or 20
 
     state.history_size = options.history_size or 10
-    state.history_fzf_path_truncate_enabled = options.history_fzf_path_truncate_enabled == nil and false or
-        options.history_fzf_path_truncate_enabled
+    state.history_fzf_path_truncate_enabled = options.history_fzf_path_truncate_enabled == nil and false
+      or options.history_fzf_path_truncate_enabled
     state.history_fzf_path_max_depth = options.history_fzf_path_max_depth or 5
-    state.history_fzf_path_truncate_long_names_enabled = options.history_fzf_path_truncate_long_names_enabled == nil and
-        false or
-        options.history_fzf_path_truncate_long_names_enabled
+    state.history_fzf_path_truncate_long_names_enabled = options.history_fzf_path_truncate_long_names_enabled == nil
+        and false
+      or options.history_fzf_path_truncate_long_names_enabled
     state.history_fzf_path_max_folder_name_length = options.history_fzf_path_max_folder_name_length or 30
 
     local special_keys_options = options.special_keys or {}
@@ -1527,7 +1634,7 @@ return {
         converted[path] = {
           tag = bookmark.tag,
           path = path,
-          key = bookmark.key
+          key = bookmark.key,
         }
       end
 
@@ -1594,13 +1701,15 @@ return {
       return
     end
 
-    if not action then return end
+    if not action then
+      return
+    end
 
     if action == "save" then
       if is_hovered_directory() then
         action_save(get_hovered_path(), false)
       else
-        ya.notify { title = "Bookmarks", content = "Selected item is not a directory", timeout = 2, level = "warn" }
+        ya.notify({ title = "Bookmarks", content = "Selected item is not a directory", timeout = 2, level = "warn" })
       end
     elseif action == "save_cwd" then
       action_save(get_current_dir_path(), false)
@@ -1608,7 +1717,7 @@ return {
       if is_hovered_directory() then
         action_save(get_hovered_path(), true)
       else
-        ya.notify { title = "Bookmarks", content = "Selected item is not a directory", timeout = 2, level = "warn" }
+        ya.notify({ title = "Bookmarks", content = "Selected item is not a directory", timeout = 2, level = "warn" })
       end
     elseif action == "save_cwd_temp" then
       action_save(get_current_dir_path(), true)
